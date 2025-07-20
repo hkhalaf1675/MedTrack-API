@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Medication } from "../../medications/entities/medication.entity";
 
 export enum UserRole {
     DOCTOR = 'doctor',
@@ -6,9 +7,7 @@ export enum UserRole {
     PATIENT = 'patient',
 }
 
-@Entity({
-    name: 'Users'
-})
+@Entity('Users')
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
@@ -62,4 +61,7 @@ export class User {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @OneToMany(() => Medication, (medication) => medication.user, { nullable: false, onDelete: 'CASCADE' })
+    medications: Medication[];
 }

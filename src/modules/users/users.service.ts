@@ -96,7 +96,7 @@ export class UsersService {
     Object.assign(user, updateUserDto);
     await this.userRepository.save(user);
 
-    return buildSuccessResponse('User has been updated successfully', null);
+    return buildSuccessResponse('User has been updated successfully', { });
   }
 
   async remove(id: number) {
@@ -108,6 +108,6 @@ export class UsersService {
 
     await this.userRepository.remove(user);
 
-    return buildSuccessResponse('User has been deleted successfully', null);
+    return buildSuccessResponse('User has been deleted successfully', { });
   }
 }

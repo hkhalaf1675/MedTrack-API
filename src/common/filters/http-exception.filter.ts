@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
 import { Response } from "express";
+import { ErrorMessages } from "../constants/error-messages";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -13,7 +14,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
         const message = exception instanceof HttpException
             ? exception.getResponse()
-            : 'Something went wrong!';
+            : ErrorMessages.GENERAL.INTERNAL_ERROR;
 
         const errorResponse = {
             success: false,

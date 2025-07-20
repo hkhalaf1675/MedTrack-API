@@ -8,6 +8,7 @@ import { dataSourceOptions } from './database/data-source';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { MedicationModule } from './modules/medications/medications.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { AuthModule } from './modules/auth/auth.module';
       }
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+    MedicationModule
   ],
   controllers: [AppController],
   providers: [AppService],
