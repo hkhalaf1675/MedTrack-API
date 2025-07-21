@@ -15,6 +15,10 @@ export const ErrorMessages = {
     CAN_NOT_UPDATE_ASSIGNED: 'Can not update assigned user.',
     NOT_FOUND: 'There is no medication with this id',
   },
+  REMINDER: {
+    NOT_FOUNT: 'There is no reminder with this id',
+    ALREADY_TAKEN: 'Already marked as taken.'
+  },
   GENERAL: {
     INTERNAL_ERROR: 'An unexpected error occurred',
     VALIDATION_ERROR: 'Validation error occurred',

@@ -1,10 +1,14 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
+import { Reminder } from "../../reminders/entities/reminder.entity";
 
 @Entity('Medications')
 export class Medication {
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Column()
+    userId: number;
 
     @Column({
         type: 'varchar',
@@ -60,4 +64,7 @@ export class Medication {
     @ManyToOne(() => User, (user) => user.medications, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: User;
+
+    @OneToMany(() => Reminder, (reminder) => reminder.medication, { nullable: false, onDelete: 'CASCADE' })
+    reminders: Reminder[];
 }

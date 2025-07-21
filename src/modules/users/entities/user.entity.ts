@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Medication } from "../../medications/entities/medication.entity";
+import { Reminder } from "../../reminders/entities/reminder.entity";
 
 export enum UserRole {
     DOCTOR = 'doctor',
@@ -64,4 +65,7 @@ export class User {
 
     @OneToMany(() => Medication, (medication) => medication.user, { nullable: false, onDelete: 'CASCADE' })
     medications: Medication[];
+
+    @OneToMany(() => Reminder, (reminder) => reminder.user, { nullable: false, onDelete: 'CASCADE' })
+    reminders: Reminder[];
 }

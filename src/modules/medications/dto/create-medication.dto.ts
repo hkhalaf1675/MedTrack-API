@@ -4,8 +4,7 @@ import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, M
 export enum MedicationRepeat {
   DAILY = 'daily',
   EVERY_X_DAYS = 'every_x_days',
-  WEEKLY = 'weekly',
-  SPECIFIC_DAYS = 'specific_days',
+  WEEKLY = 'weekly'
 }
 
 export class CreateMedicationDto {

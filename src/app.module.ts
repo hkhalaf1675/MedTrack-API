@@ -9,6 +9,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MedicationModule } from './modules/medications/medications.module';
+import { RemindersModule } from './modules/reminders/reminders.module';
+import { ReminderSchedulerService } from './modules/reminders/reminder-scheduler.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -30,9 +33,11 @@ import { MedicationModule } from './modules/medications/medications.module';
         }
       }
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
-    MedicationModule
+    MedicationModule,
+    RemindersModule
   ],
   controllers: [AppController],
   providers: [AppService],
