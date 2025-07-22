@@ -1,98 +1,133 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# MedTrack API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+MedTrack is a RESTful API for managing medications and reminders. It's designed to help users track their medication intake and receive timely reminders. Built with modern tools like **NestJS**, **TypeORM**, and **Redis** for caching.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🧭 Table of Contents
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [🛠️ Tech Stack](#️-tech-stack)
+- [✨ Features](#-features)
+- [🚀 Installation](#-installation)
+- [📦 Running with Docker](#-running-with-docker)
+- [🔐 Authentication](#-authentication)
+- [📘 API Overview](#-api-overview)
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+## 🛠️ Tech Stack
 
-## Compile and run the project
+- **Node.js** with [NestJS](https://nestjs.com/)
+- **TypeScript**
+- **TypeORM** with PostgreSQL
+- **Redis** (for caching reminders)
+- **Docker** (optional)
+- **JWT** (authentication)
 
-```bash
-# development
-$ npm run start
+---
 
-# watch mode
-$ npm run start:dev
+## ✨ Features
 
-# production mode
-$ npm run start:prod
-```
+- User registration and login (JWT-based auth)
+- CRUD for users and medications
+- Daily reminders with caching
+- Mark reminders as taken
+- Pagination for lists
+- Redis integration for fast retrieval of today's reminders
+- Ready for Docker deployment
 
-## Run tests
+---
+
+## 🚀 Installation
+
+> Make sure you have Node.js, MYSQL, and Redis installed.
 
 ```bash
-# unit tests
-$ npm run test
+# Clone the repository
+git clone https://github.com/hkhalaf1675/MedTrack-API.git
+cd MedTrack-API
 
-# e2e tests
-$ npm run test:e2e
+# Install dependencies
+npm ci
 
-# test coverage
-$ npm run test:cov
+# Set environment variables
+cp .env.example .env
+# Fill in your database URL and JWT secret in `.env`
+
+# Run migrations
+npm run migrate
+
+# Start the development server
+npm run start:dev
+
+# Start the production server
+npm start
 ```
 
-## Deployment
+## 📦 Running with Docker
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+> Make sure you have Docker and Docker compose installed.
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Use docker compose to run the project
+docker-compose up --build
+
+# Create docker image and run container from it
+docker build --tag medtrackapi .
+
+# Run the container
+docker run --name medtrackapi-con --env-file ./.env medtrackapi
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🔐 Authentication
 
-## Resources
+> All protected routes require an Authorization header:
 
-Check out a few resources that may come in handy when working with NestJS:
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 📘 API Overview <a id='api-overview'></a>  
+**Base URL:** `{{baseUrl}}`  
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Authentication  
+| Endpoint | Method | Description |  
+|----------|--------|-------------|  
+| `/api/auth/register` | `POST` | Register a new user |  
+| `/api/auth/login` | `POST` | Log in and obtain JWT token |  
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Users  
+| Endpoint | Method | Description |  
+|----------|--------|-------------|  
+| `/api/users` | `POST` | Create a new user |  
+| `/api/users/:id` | `PATCH` | Update a user by ID |  
+| `/api/users` | `DELETE` | Delete a user (requires `id` in body) |  
+| `/api/users/:id` | `GET` | Get a user by ID |  
+| `/api/users` | `GET` | Get paginated list of users |  
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Medications  
+| Endpoint | Method | Description |  
+|----------|--------|-------------|  
+| `/api/medications` | `POST` | Create a new medication |  
+| `/api/medications/:id` | `PATCH` | Update a medication by ID |  
+| `/api/medications` | `DELETE` | Delete a medication (requires `id` in body) |  
+| `/api/medications/:id` | `GET` | Get a medication by ID |  
+| `/api/medications` | `GET` | Get paginated list of medications |  
+
+---
+
+## Reminders  
+| Endpoint | Method | Description |  
+|----------|--------|-------------|  
+| `/api/reminders/:id/mark-taken` | `PATCH` | Update reminder status (e.g., mark as taken) |  
+| `/api/reminders/:id` | `GET` | Get a reminder by ID |  
+| `/api/reminders` | `GET` | Get paginated list of reminders |  
+| `/api/reminders/today` | `GET` | Get today’s reminders (paginated & cached) |  
+
+---
