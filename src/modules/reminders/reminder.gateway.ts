@@ -28,6 +28,9 @@ export class ReminderGateway implements OnGatewayInit {
   }
 
   sendReminderToUser(userId: number, reminder: Reminder) {
-    this.server.to(String(userId)).emit('reminder', reminder);
+    this.server.to(String(userId)).emit('reminder', {
+      messsage: `Time to take your medication: ${reminder.medication.name}`,
+      time: reminder.time
+    });
   }
 }
