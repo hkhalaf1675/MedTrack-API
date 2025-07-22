@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { RemindersService } from './reminders.service';
 import { IReminderQuery } from './interfaces/reminder-query.interface';
 import { AuthGuard } from '../../common/guards/auth.guard';
@@ -13,6 +13,11 @@ export class RemindersController {
     return this.remindersService.findAll(query, req.user);
   }
 
+  @Get('today')
+  findTodays(@Query() query: IReminderQuery, @Request() req: any){
+    return this.remindersService.findTodays(query, req.user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.remindersService.findOne(+id);
@@ -22,4 +27,5 @@ export class RemindersController {
   updateStatus(@Param('id') id: string, @Request() req: any){
     return this.remindersService.updateStatus(+id, req.user);
   }
+
 }

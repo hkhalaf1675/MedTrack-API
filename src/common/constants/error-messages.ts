@@ -16,7 +16,7 @@ export const ErrorMessages = {
     NOT_FOUND: 'There is no medication with this id',
   },
   REMINDER: {
-    NOT_FOUNT: 'There is no reminder with this id',
+    NOT_FOUND: 'There is no reminder with this id',
     ALREADY_TAKEN: 'Already marked as taken.'
   },
   GENERAL: {

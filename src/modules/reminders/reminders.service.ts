@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medication } from '../medications/entities/medication.entity';
-import { IsNull, LessThan, MoreThan, Or, Repository } from 'typeorm';
+import { IsNull, LessThan, MoreThan, MoreThanOrEqual, Or, Repository } from 'typeorm';
 import { Reminder, ReminderStatus } from './entities/reminder.entity';
 import { User } from '../users/entities/user.entity';
 import { addDays, differenceInDays, startOfDay } from 'date-fns';
@@ -9,6 +9,8 @@ import { MedicationRepeat } from '../medications/dto/create-medication.dto';
 import { buildFailResponse, buildPaginationResponse, buildSuccessResponse } from '../../common/utils/api-response';
 import { IReminderQuery } from './interfaces/reminder-query.interface';
 import { ErrorMessages } from '../../common/constants/error-messages';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class RemindersService {
@@ -16,36 +18,15 @@ export class RemindersService {
     @InjectRepository(Medication)
     private readonly medicationRepository: Repository<Medication>,
     @InjectRepository(Reminder)
-    private readonly reminderRepository: Repository<Reminder>
+    private readonly reminderRepository: Repository<Reminder>,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache
   ) {}
 
   async findAll(query: IReminderQuery, user: User) {
-    let { page = 1, perPage = 10, medicationId, userId, date } = query;
+    const { total, page, perPage, reminders } = await this.getMany(query, user, false);
 
-    const queryBuilder = this.reminderRepository.createQueryBuilder('reminder');
-
-    if(userId){
-      queryBuilder.where('reminder.userId = :userId', { userId });
-      queryBuilder.leftJoinAndSelect('reminder.user', 'user');
-    }
-    else{
-      queryBuilder.where('reminder.userId = :userId', { userId: user.id });
-    }
-
-    if(medicationId){
-      queryBuilder.andWhere('reminder.medicationId = :medicationId', { medicationId });
-    }
-
-    if(date){
-      queryBuilder.andWhere('reminder.date = :date', { date });
-    }
-
-    queryBuilder.skip((page - 1) * perPage).take(perPage);
-    queryBuilder.orderBy('reminder.id', 'DESC');
-
-    const [reminders, total] = await queryBuilder.getManyAndCount();
-
-    return buildPaginationResponse(total, page, perPage, reminders );
+    return buildPaginationResponse(total, page, perPage, reminders);
   }
 
   async findOne(id: number) {
@@ -61,7 +42,7 @@ export class RemindersService {
     const reminder = await this.reminderRepository.findOneBy({ id });
 
     if(!reminder){
-      throw new NotFoundException(buildFailResponse(404, [ErrorMessages.REMINDER.NOT_FOUNT]));
+      throw new NotFoundException(buildFailResponse(404, [ErrorMessages.REMINDER.NOT_FOUND]));
     }
 
     if(reminder.userId !== user.id){
@@ -80,22 +61,41 @@ export class RemindersService {
     return buildSuccessResponse('Reminder status has been changed successfully', {});
   }
 
-  async generateNextDayReminders() {
-    const currentDate = new Date();
-    const tomorrow = startOfDay(addDays(currentDate, 1));
+  async findTodays(query: IReminderQuery, user: User) {
+    query.page = query.page ?? 1;
+    query.perPage = query.perPage ?? 100;
+
+    const cacheKey = `reminders:today:user:${user.id}`;
+    const cached = await this.cacheManager.get(cacheKey);
+
+    if(cached){
+      return cached;
+    }
+
+    const { total, page, perPage, reminders } = await this.getMany({page: query.page, perPage: query.perPage}, user, true);
+
+    const response = buildPaginationResponse(total, page, perPage, reminders);
+
+    await this.cacheManager.set(cacheKey, JSON.stringify(response), 60 * 60 * 12);
+
+    return response;
+  }
+
+  async generateNextDayReminders(date: Date) {
+    const reminderDate = startOfDay(date);
     let reminderArr: Reminder[] = [];
 
     const medications = await this.medicationRepository.find({
       relations: { user: true },
       where: {
-        endDate: Or(IsNull(), MoreThan(currentDate))
+        endDate: Or(IsNull(), MoreThanOrEqual(reminderDate))
       }
     });
 
     for (const medication of medications) {
       const shouldCreate = await this.shouldGenerateReminder(medication);
       if(shouldCreate){
-        reminderArr.push(...this.createRemindersForMedication(medication, medication.userId, tomorrow));
+        reminderArr.push(...this.createRemindersForMedication(medication, medication.userId, reminderDate));
       }
     }
 
@@ -103,7 +103,7 @@ export class RemindersService {
   }
 
   async checkMissingMedications() {
-    const today = new Date();
+    const today = startOfDay(new Date());
     const reminders = await this.reminderRepository.find({
       where: {
         status: ReminderStatus.PENDING,
@@ -155,5 +155,39 @@ export class RemindersService {
     });
 
     return reminders;
+  }
+
+  private async getMany(query: IReminderQuery, user: User, today: boolean = true) {
+    let { page = 1, perPage = 10, medicationId, userId, date } = query;
+
+    const queryBuilder = this.reminderRepository.createQueryBuilder('reminder');
+
+    if(userId){
+      queryBuilder.where('reminder.userId = :userId', { userId });
+      queryBuilder.leftJoinAndSelect('reminder.user', 'user');
+    }
+    else{
+      queryBuilder.where('reminder.userId = :userId', { userId: user.id });
+    }
+
+    if(medicationId){
+      queryBuilder.andWhere('reminder.medicationId = :medicationId', { medicationId });
+    }
+
+    if(today){
+      const today = startOfDay(new Date());
+      queryBuilder.andWhere('reminder.date = :date', { date: today });
+    }
+    else if(date){
+      queryBuilder.andWhere('reminder.date = :date', { date });
+    }
+
+    queryBuilder.leftJoinAndSelect('reminder.medication', 'medication');
+    queryBuilder.skip((page - 1) * perPage).take(perPage);
+    queryBuilder.orderBy('reminder.id', 'DESC');
+
+    const [reminders, total] = await queryBuilder.getManyAndCount();
+
+    return { reminders, total, page, perPage };
   }
 }

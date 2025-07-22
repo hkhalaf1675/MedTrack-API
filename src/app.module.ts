@@ -10,8 +10,9 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MedicationModule } from './modules/medications/medications.module';
 import { RemindersModule } from './modules/reminders/reminders.module';
-import { ReminderSchedulerService } from './modules/reminders/reminder-scheduler.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-ioredis';
 
 @Module({
   imports: [
@@ -34,6 +35,15 @@ import { ScheduleModule } from '@nestjs/schedule';
       }
     }),
     ScheduleModule.forRoot(),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: () => ({
+        store: redisStore,
+        host: 'localhost',
+        port: 6379,
+        ttl: 60 * 60,
+      }),
+    }),
     UsersModule,
     AuthModule,
     MedicationModule,
