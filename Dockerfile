@@ -10,9 +10,9 @@ RUN npm ci
 
 COPY . .
 
-ENV PORT=6000
+ENV PORT=3003
 
-EXPOSE 6000
+EXPOSE 3003
 
 RUN npm run build
 

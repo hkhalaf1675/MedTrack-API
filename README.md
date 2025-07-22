@@ -11,7 +11,7 @@ MedTrack is a RESTful API for managing medications and reminders. It's designed 
 - [🚀 Installation](#-installation)
 - [📦 Running with Docker](#-running-with-docker)
 - [🔐 Authentication](#-authentication)
-- [📘 API Overview](#-api-overview)
+- [📘 API Overview](#api-overview)
 
 ---
 
@@ -19,8 +19,9 @@ MedTrack is a RESTful API for managing medications and reminders. It's designed 
 
 - **Node.js** with [NestJS](https://nestjs.com/)
 - **TypeScript**
-- **TypeORM** with PostgreSQL
+- **TypeORM** with MySQL
 - **Redis** (for caching reminders)
+- **WebSocket** (for reminder notifications)
 - **Docker** (optional)
 - **JWT** (authentication)
 
@@ -34,6 +35,7 @@ MedTrack is a RESTful API for managing medications and reminders. It's designed 
 - Mark reminders as taken
 - Pagination for lists
 - Redis integration for fast retrieval of today's reminders
+- Real-time reminder delivery via WebSocket
 - Ready for Docker deployment
 
 ---
