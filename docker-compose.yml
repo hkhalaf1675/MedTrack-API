@@ -1,0 +1,27 @@
+version: "3"
+services:
+  api:
+    container_name: medtrackapi-con
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+     - "6000:6000"
+    depends_on:
+      - redis
+    env_file:
+      - ./.env
+    networks:
+      - medtrack-network
+
+  redis:
+    container_name: redis-con
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - medtrack-network
+
+networks:
+  medtrack-network:
+    driver: bridge
