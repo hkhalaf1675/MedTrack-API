@@ -87,7 +87,7 @@ docker run --name medtrackapi-con --env-file ./.env medtrackapi
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-## 📘 API Overview <a name="api-overview"></a>  
+## 📘 API Overview <a name="#api-overview"></a>  
 **Base URL:** `{{baseUrl}}`  
 
 ---

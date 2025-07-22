@@ -1,10 +1,10 @@
 import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medication } from '../medications/entities/medication.entity';
-import { IsNull, LessThan, MoreThan, MoreThanOrEqual, Or, Repository } from 'typeorm';
+import { Equal, IsNull, LessThan, MoreThan, MoreThanOrEqual, Or, Raw, Repository } from 'typeorm';
 import { Reminder, ReminderStatus } from './entities/reminder.entity';
 import { User } from '../users/entities/user.entity';
-import { addDays, differenceInDays, startOfDay } from 'date-fns';
+import { addDays, differenceInDays, format, startOfDay } from 'date-fns';
 import { MedicationRepeat } from '../medications/dto/create-medication.dto';
 import { buildFailResponse, buildPaginationResponse, buildSuccessResponse } from '../../common/utils/api-response';
 import { IReminderQuery } from './interfaces/reminder-query.interface';
@@ -113,6 +113,25 @@ export class RemindersService {
 
     reminders.forEach(reminder => reminder.status = ReminderStatus.MISSED);
     await this.reminderRepository.save(reminders);
+  }
+
+  async findRemindersAtSpecificTime(date: Date): Promise<Reminder[]>{
+    const dateTime = format(date, 'HH:mm');
+    const dateFormated = new Date(date.setHours(0, 0, 0, 0));
+
+    const reminders = await this.reminderRepository.find({
+      where: {
+        date: dateFormated,
+        time: Equal(dateTime),
+        status: ReminderStatus.PENDING
+      },
+      relations: {
+        user: true,
+        medication: true
+      }
+    });
+
+    return reminders;
   }
 
   private async shouldGenerateReminder(medication: Medication): Promise<boolean> {

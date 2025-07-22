@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, MaxLength, Min, ValidateIf } from "class-validator";
+import { IsArray, IsDate, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, Matches, MaxLength, Min, ValidateIf } from "class-validator";
 
 export enum MedicationRepeat {
   DAILY = 'daily',
@@ -42,6 +42,10 @@ export class CreateMedicationDto {
     @IsDefined()
     @IsNotEmpty({ each: true })
     @IsArray()
+    @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+      each: true,
+      message: 'Each time must be in HH:mm format (e.g., "22:00")'
+    })
     times: string[];
 
     @IsOptional()
